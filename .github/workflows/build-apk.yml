@@ -22,10 +22,12 @@ jobs:
           java-version: '17'
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
 
-      - name: Install Android API 35
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Install Android packages
+        run: |
+          yes | sdkmanager --licenses || true
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Set up Gradle 8.9
         uses: gradle/actions/setup-gradle@v4
@@ -37,11 +39,17 @@ jobs:
           rm -rf projeto
           mkdir -p projeto
           unzip -o NexaMusic_v2.zip -d projeto
-          ls -la projeto/NexaMusic_v2
+          echo "Conteudo extraido:"
+          find projeto -maxdepth 2 -type f | head -50
 
       - name: Build Nexa Music v2 APK
         working-directory: projeto/NexaMusic_v2
-        run: gradle :app:assembleDebug --no-daemon --stacktrace
+        run: |
+          gradle :app:assembleDebug --no-daemon --stacktrace
+
+      - name: Check APK
+        run: |
+          ls -lah projeto/NexaMusic_v2/app/build/outputs/apk/debug/
 
       - name: Upload Nexa Music v2 APK
         uses: actions/upload-artifact@v4
@@ -49,4 +57,3 @@ jobs:
           name: Nexa-Music-v2-APK
           path: projeto/NexaMusic_v2/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-          
