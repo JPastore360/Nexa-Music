@@ -1,4 +1,4 @@
-name: Build Nexa Music v3 APK
+name: Build Nexa Music v4 APK
 
 on:
   workflow_dispatch:
@@ -34,26 +34,26 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      - name: Extract Nexa Music v3
+      - name: Extract Nexa Music v4
         run: |
           rm -rf projeto
           mkdir -p projeto
-          unzip -o NexaMusic_v3_COMPLETO_CORRIGIDO.zip -d projeto
+          unzip -o NexaMusic_v4.zip -d projeto
           echo "Projeto extraído:"
-          find projeto/NexaMusic_v3 -maxdepth 2 -type f | sort | head -100
+          find projeto/NexaMusic_v4 -maxdepth 2 -type f | sort | head -100
 
-      - name: Build Nexa Music v3 APK
-        working-directory: projeto/NexaMusic_v3
+      - name: Build Nexa Music v4 APK
+        working-directory: projeto/NexaMusic_v4
         run: |
           gradle :app:assembleDebug --no-daemon --stacktrace
 
       - name: Check APK
         run: |
-          ls -lah projeto/NexaMusic_v3/app/build/outputs/apk/debug/
+          ls -lah projeto/NexaMusic_v4/app/build/outputs/apk/debug/
 
-      - name: Upload Nexa Music v3 APK
+      - name: Upload Nexa Music v4 APK
         uses: actions/upload-artifact@v4
         with:
-          name: Nexa-Music-v3-APK
-          path: projeto/NexaMusic_v3/app/build/outputs/apk/debug/app-debug.apk
+          name: Nexa-Music-v4-APK
+          path: projeto/NexaMusic_v4/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
