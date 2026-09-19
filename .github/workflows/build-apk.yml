@@ -3,15 +3,13 @@ name: Build Nexa Music APK
 on:
   workflow_dispatch:
   push:
-    branches:
-      - principal
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Baixar projeto
+      - name: Baixar arquivos do repositório
         uses: actions/checkout@v4
 
       - name: Configurar Java 17
@@ -23,25 +21,35 @@ jobs:
       - name: Configurar Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Instalar Android 35
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Instalar Android API 35
+        run: |
+          yes | sdkmanager --licenses
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
-      - name: Configurar Gradle
+      - name: Configurar Gradle 8.9
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
 
-      - name: Extrair Nexa Music
+      - name: Extrair projeto Nexa Music
         run: |
+          rm -rf projeto
           mkdir projeto
           unzip -o NexaMusic_v1.zip -d projeto
+          echo "Projeto extraído:"
+          ls -la projeto/NexaMusic_v1
 
-      - name: Gerar APK
+      - name: Compilar APK
         working-directory: projeto/NexaMusic_v1
         run: gradle :app:assembleDebug --stacktrace
 
-      - name: Salvar APK
+      - name: Verificar APK gerado
+        run: |
+          ls -la projeto/NexaMusic_v1/app/build/outputs/apk/debug/
+
+      - name: Disponibilizar APK para download
         uses: actions/upload-artifact@v4
         with:
-          name: Nexa-Music-v1
+          name: Nexa-Music-v1-APK
           path: projeto/NexaMusic_v1/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
