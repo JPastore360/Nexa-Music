@@ -1,4 +1,4 @@
-name: Build Nexa Music v6 APK
+name: Build Nexa Music v7 APK
 
 on:
   workflow_dispatch:
@@ -34,21 +34,21 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      - name: Extract Nexa Music v6
+      - name: Extract Nexa Music v7
         run: |
           rm -rf projeto
           mkdir -p projeto
-          unzip -o NexaMusic_v6.zip -d projeto
-          test -f projeto/NexaMusic_v6/app/build.gradle.kts
-          test -f projeto/NexaMusic_v6/app/nexa-test.keystore
+          unzip -o NexaMusic_v7.zip -d projeto
+          test -f projeto/NexaMusic_v7/app/build.gradle.kts
+          test -f projeto/NexaMusic_v7/app/nexa-test.keystore
 
       - name: Verify stable signing certificate
-        working-directory: projeto/NexaMusic_v6
+        working-directory: projeto/NexaMusic_v7
         run: |
           keytool -list -v -keystore app/nexa-test.keystore -storepass nexa-music-debug -alias nexa | grep -E "SHA1:|SHA256:" || true
 
-      - name: Build Nexa Music v6 APK
-        working-directory: projeto/NexaMusic_v6
+      - name: Build Nexa Music v7 APK
+        working-directory: projeto/NexaMusic_v7
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
@@ -59,11 +59,11 @@ jobs:
 
       - name: Check APK
         run: |
-          ls -lah projeto/NexaMusic_v6/app/build/outputs/apk/debug/
+          ls -lah projeto/NexaMusic_v7/app/build/outputs/apk/debug/
 
-      - name: Upload Nexa Music v6 APK
+      - name: Upload Nexa Music v7 APK
         uses: actions/upload-artifact@v4
         with:
-          name: Nexa-Music-v6-APK
-          path: projeto/NexaMusic_v6/app/build/outputs/apk/debug/app-debug.apk
+          name: Nexa-Music-v7-APK
+          path: projeto/NexaMusic_v7/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
